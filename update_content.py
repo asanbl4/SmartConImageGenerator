@@ -1,5 +1,5 @@
 from googleapiclient.http import MediaFileUpload
-from auth import service, drive_service, firebase_admin  # Connect Google Docs and Drive API clients
+from auth import service, drive_service # Connect Google Docs and Drive API clients
 from dotenv import load_dotenv
 import os
 import json
@@ -57,6 +57,7 @@ def update_document_content():
     doc = service.documents().get(documentId=DOCUMENT_ID).execute()
     content_length = doc.get('body').get('content')[-1].get('endIndex') - 1
 
+    # Clear previous content
     clear_request = [
         {
             'deleteContentRange': {
@@ -71,13 +72,15 @@ def update_document_content():
     service.documents().batchUpdate(
         documentId=DOCUMENT_ID, body={'requests': clear_request}).execute()
 
+    # Define header and body texts
     header_text = "First Movement: Daily Transactions Crescendo"
     body_text = (
-        "Watch as the daily transactions soar, painting a vivid picture of zkSync's growing adoption. "
+        "Watch as the daily transactions soar, painting a vivid picture of zkSync's growingd. adoption. "
         "This rising melody represents more users discovering the power and efficiency of layer-2 scaling."
     )
     additional_line_breaks = "\n" * 2
 
+    # Format header text
     header_request = [
         {
             'insertText': {
@@ -103,9 +106,6 @@ def update_document_content():
                     'startIndex': 1,
                     'endIndex': len(header_text) + 1,
                 },
-                'paragraphStyle': {
-                    'alignment': 'CENTER'
-                },
                 'fields': 'alignment'
             }
         }
@@ -117,6 +117,29 @@ def update_document_content():
                 'location': {'index': len(header_text) + 3},
                 'text': body_text + additional_line_breaks
             }
+        },
+        {
+            'updateTextStyle': {
+                'range': {
+                    'startIndex': len(header_text) + 3,
+                    'endIndex': len(header_text) + 3 + len(body_text),
+                },
+                'textStyle': {
+                    'weightedFontFamily': {
+                        'fontFamily': 'Poppins'
+                    }
+                },
+                'fields': 'weightedFontFamily'
+            }
+        },
+        {
+            'updateParagraphStyle': {
+                'range': {
+                    'startIndex': len(header_text) + 3,
+                    'endIndex': len(header_text) + 3 + len(body_text),
+                },
+                'fields': 'alignment'
+            }
         }
     ]
 
@@ -126,13 +149,16 @@ def update_document_content():
     print("Document updated with formatted header and body text!")
     time.sleep(5)
 
+    # Load image ID from data.json or upload a new image to Drive
     with open("data.json", "r") as file:
         data = json.load(file)
 
     image_file_id = data['footer'] if data['footer'] else upload_image_to_drive(IMAGE_PATH)
 
+    # Calculate the image insertion index
     image_index = len(header_text) + len(body_text) + len(additional_line_breaks) + 3
 
+    # Insert image
     insert_image_request = [
         {
             'insertInlineImage': {
