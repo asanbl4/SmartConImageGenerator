@@ -3,3 +3,4 @@ venv/
 .env
 *.json
 *.pdf
+__pycache__/

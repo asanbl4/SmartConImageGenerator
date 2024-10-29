@@ -7,7 +7,7 @@ def convert_pdf_to_jpg(pdf_path, output_path):
     image_paths = []
 
     for i, image in enumerate(images):
-        cropped_image = image.crop((0, 0, 900, 384))
+        cropped_image = image.crop((0, 0, 1600, 768))
         resized_image = cropped_image.resize((900, 384), Image.Resampling.LANCZOS)
         resized_image.save(output_path, 'PNG')
         image_paths.append(output_path)
