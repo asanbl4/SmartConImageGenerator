@@ -1,19 +1,35 @@
 from googleapiclient.http import MediaFileUpload
-from auth import service, drive_service  # Connect Google Docs and Drive API clients
+from auth import service, drive_service, firebase_admin  # Connect Google Docs and Drive API clients
 from dotenv import load_dotenv
 import os
 import json
 import time
+from firebase_admin import storage
 
 load_dotenv()
 
-# Specify the document ID (from the Google Docs URL)
+
 DOCUMENT_ID = os.getenv('IMG1_ID')
 IMAGE_PATH = 'testimg.jpeg'  # Path to the image
 
 
+def upload_image_to_firebase(image_path="IMG1.png"):
+    image_name = image_path
+    bucket = storage.bucket()
+    blob = bucket.blob(image_name)
+
+    # Upload the image and override any existing file with the same name
+    blob.upload_from_filename(image_path)
+
+    # Set the image to be publicly accessible
+    blob.make_public()
+
+    print(f"Image uploaded to Firebase Storage with URL: {blob.public_url}")
+
+    return blob.public_url
+
+
 def upload_image_to_drive(image_path):
-    # Upload image to Google Drive
     file_metadata = {'name': 'Test Image', 'mimeType': 'image/png'}
     media = MediaFileUpload(image_path, mimetype='image/png')
 
@@ -25,7 +41,6 @@ def upload_image_to_drive(image_path):
 
     file_id = uploaded_file.get('id')
 
-    # Make the image publicly accessible
     drive_service.permissions().create(
         fileId=file_id,
         body={'type': 'anyone', 'role': 'reader'}
@@ -39,7 +54,6 @@ def upload_image_to_drive(image_path):
 
 
 def update_document_content():
-    # Clear existing content in the document
     doc = service.documents().get(documentId=DOCUMENT_ID).execute()
     content_length = doc.get('body').get('content')[-1].get('endIndex') - 1
 
@@ -57,34 +71,67 @@ def update_document_content():
     service.documents().batchUpdate(
         documentId=DOCUMENT_ID, body={'requests': clear_request}).execute()
 
-    # Define the text and line breaks before the image
-    text_content = "First line of text.\nSecond line of text.\nThird line of text."
-    additional_line_breaks = "\n" * (6 - text_content.count('\n'))  # Two line breaks after the text
+    header_text = "First Movement: Daily Transactions Crescendo"
+    body_text = (
+        "Watch as the daily transactions soar, painting a vivid picture of zkSync's growing adoption. "
+        "This rising melody represents more users discovering the power and efficiency of layer-2 scaling."
+    )
+    additional_line_breaks = "\n" * 2
 
-    # Insert the text and line breaks at the beginning of the document
-    new_content_request = [
+    header_request = [
         {
             'insertText': {
                 'location': {'index': 1},
-                'text': text_content + additional_line_breaks
+                'text': header_text + "\n\n"
+            }
+        },
+        {
+            'updateTextStyle': {
+                'range': {
+                    'startIndex': 1,
+                    'endIndex': len(header_text) + 1,
+                },
+                'textStyle': {
+                    'bold': True,
+                },
+                'fields': 'bold'
+            }
+        },
+        {
+            'updateParagraphStyle': {
+                'range': {
+                    'startIndex': 1,
+                    'endIndex': len(header_text) + 1,
+                },
+                'paragraphStyle': {
+                    'alignment': 'CENTER'
+                },
+                'fields': 'alignment'
+            }
+        }
+    ]
+
+    body_request = [
+        {
+            'insertText': {
+                'location': {'index': len(header_text) + 3},
+                'text': body_text + additional_line_breaks
             }
         }
     ]
 
     service.documents().batchUpdate(
-        documentId=DOCUMENT_ID, body={'requests': new_content_request}).execute()
+        documentId=DOCUMENT_ID, body={'requests': header_request + body_request}).execute()
 
-    print("New content with custom text and line breaks inserted successfully!")
+    print("Document updated with formatted header and body text!")
     time.sleep(5)
 
-    # Upload the image if it hasn't been uploaded yet
     with open("data.json", "r") as file:
         data = json.load(file)
 
     image_file_id = data['footer'] if data['footer'] else upload_image_to_drive(IMAGE_PATH)
 
-    # Insert the image at the appropriate index (after text and line breaks)
-    image_index = len(text_content) + len(additional_line_breaks)
+    image_index = len(header_text) + len(body_text) + len(additional_line_breaks) + 3
 
     insert_image_request = [
         {
@@ -102,10 +149,10 @@ def update_document_content():
     service.documents().batchUpdate(
         documentId=DOCUMENT_ID, body={'requests': insert_image_request}).execute()
 
-    print("Image inserted successfully after text and line breaks!")
+    print("Image inserted successfully after header and body text!")
     return DOCUMENT_ID
 
 
-# Run the document update function
 if __name__ == '__main__':
     update_document_content()
+    firebase_url = upload_image_to_firebase("IMG1.png")  # Upload the image to Firebase
