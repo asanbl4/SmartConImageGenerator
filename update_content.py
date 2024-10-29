@@ -14,8 +14,8 @@ IMAGE_PATH = 'testimg.jpeg'  # Path to the image
 
 def upload_image_to_drive(image_path):
     # Upload image to Google Drive
-    file_metadata = {'name': 'Test Image', 'mimeType': 'image/jpeg'}
-    media = MediaFileUpload(image_path, mimetype='image/jpeg')
+    file_metadata = {'name': 'Test Image', 'mimeType': 'image/png'}
+    media = MediaFileUpload(image_path, mimetype='image/png')
 
     uploaded_file = drive_service.files().create(
         body=file_metadata,
