@@ -4,7 +4,11 @@ from downloader import download_doc_as_pdf
 
 
 if __name__ == '__main__':
-    doc_id = update_document_content()
-    download_doc_as_pdf(doc_id=doc_id, output_path="IMG1.pdf")
-    convert_pdf_to_jpg("IMG1.pdf", "IMG1.png")
-    firebase_url = upload_image_to_firebase("IMG1.png")
+    for i in range(1, 3):
+        if_dark = False
+        if i == 2:
+            if_dark = True
+        doc_id = update_document_content(i, if_dark)
+        download_doc_as_pdf(doc_id=doc_id, output_path=f"IMG{i}.pdf")
+        convert_pdf_to_jpg(f"IMG{i}.pdf", f"IMG{i}.png")
+        firebase_url = upload_image_to_firebase(f"IMG{i}.png")

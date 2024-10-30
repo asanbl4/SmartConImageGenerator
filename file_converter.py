@@ -6,7 +6,7 @@ def convert_pdf_to_jpg(pdf_path, output_path):
     image_paths = []
 
     for i, image in enumerate(images):
-        cropped_image = image.crop((200, 0, 1450, 880))  # 880 lower crop bound
+        cropped_image = image.crop((160, 0, 1460, 680))  # 880 lower crop bound
         cropped_image.save(output_path, 'PNG')
         image_paths.append(output_path)
         print(f"Saved page {i + 1} as PNG at {output_path}")

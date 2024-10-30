@@ -9,10 +9,6 @@ from firebase_admin import storage
 load_dotenv()
 
 
-DOCUMENT_ID = os.getenv('IMG1_ID')
-IMAGE_PATH = 'insert.jpeg'  # Path to the image
-
-
 def upload_image_to_firebase(image_path="IMG1.png"):
     image_name = image_path
     bucket = storage.bucket()
@@ -29,7 +25,7 @@ def upload_image_to_firebase(image_path="IMG1.png"):
     return blob.public_url
 
 
-def upload_image_to_drive(image_path):
+def upload_image_to_drive(image_path, if_dark=True):
     file_metadata = {'name': 'Test Image', 'mimeType': 'image/png'}
     media = MediaFileUpload(image_path, mimetype='image/png')
 
@@ -47,13 +43,19 @@ def upload_image_to_drive(image_path):
     ).execute()
 
     print(f"Image uploaded and made public successfully with ID: {file_id}")
+    with open("data.json", "r") as file:
+        data = json.load(file)
+    if if_dark:
+        data["footer_dark"] = file_id
+    else:
+        data["footer_white"] = file_id
     with open('data.json', 'w') as file:
-        json.dump({"footer": file_id}, file)
-
+        json.dump(data, file)
     return file_id
 
 
-def update_document_content():
+def update_document_content(i=1, if_dark=True):
+    DOCUMENT_ID = os.getenv(f'IMG{i}_ID')
     doc = service.documents().get(documentId=DOCUMENT_ID).execute()
     content_length = doc.get('body').get('content')[-1].get('endIndex') - 1
 
@@ -81,6 +83,10 @@ def update_document_content():
     additional_line_breaks = "\n" * 2
 
     # Format header text
+    # Define your color condition
+    text_color = {"foregroundColor": {"color": {"rgbColor": {"red": 1, "green": 1, "blue": 1}}}} if if_dark else {
+        "foregroundColor": {"color": {"rgbColor": {"red": 0, "green": 0, "blue": 0}}}}
+
     header_request = [
         {
             'insertText': {
@@ -96,8 +102,9 @@ def update_document_content():
                 },
                 'textStyle': {
                     'bold': True,
+                    **text_color  # Apply the color conditionally
                 },
-                'fields': 'bold'
+                'fields': 'bold,foregroundColor'
             }
         },
         {
@@ -127,9 +134,10 @@ def update_document_content():
                 'textStyle': {
                     'weightedFontFamily': {
                         'fontFamily': 'Poppins'
-                    }
+                    },
+                    **text_color  # Apply the color conditionally
                 },
-                'fields': 'weightedFontFamily'
+                'fields': 'weightedFontFamily,foregroundColor'
             }
         },
         {
@@ -152,8 +160,10 @@ def update_document_content():
     # Load image ID from data.json or upload a new image to Drive
     with open("data.json", "r") as file:
         data = json.load(file)
-
-    image_file_id = data['footer'] if data['footer'] else upload_image_to_drive(IMAGE_PATH)
+    if if_dark:
+        image_file_id = data['footer_dark'] if data['footer_dark'] else upload_image_to_drive("insert_dark.png", if_dark)
+    else:
+        image_file_id = data['footer_white'] if data['footer_white'] else upload_image_to_drive("insert_white.png", if_dark)
 
     # Calculate the image insertion index
     image_index = len(header_text) + len(body_text) + len(additional_line_breaks) + 3
@@ -166,7 +176,7 @@ def update_document_content():
                 'uri': f'https://drive.google.com/uc?export=view&id={image_file_id}',
                 'objectSize': {
                     'height': {'magnitude': 200, 'unit': 'PT'},
-                    'width': {'magnitude': 200, 'unit': 'PT'}
+                    'width': {'magnitude': 447, 'unit': 'PT'}
                 }
             }
         }
