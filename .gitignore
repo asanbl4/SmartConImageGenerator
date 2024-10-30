@@ -4,3 +4,4 @@ venv/
 *.json
 *.pdf
 __pycache__/
+testimg.png

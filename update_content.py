@@ -10,7 +10,7 @@ load_dotenv()
 
 
 DOCUMENT_ID = os.getenv('IMG1_ID')
-IMAGE_PATH = 'testimg.jpeg'  # Path to the image
+IMAGE_PATH = 'insert.jpeg'  # Path to the image
 
 
 def upload_image_to_firebase(image_path="IMG1.png"):
