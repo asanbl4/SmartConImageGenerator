@@ -4,27 +4,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ACCESS_TOKEN = os.getenv("SPACE_AND_TIME_ACCESS_TOKEN")
+API_KEY = os.getenv("SPACE_AND_TIME_API_KEY")
 
 
 def send_sql(query):
-    url = "https://api.spaceandtime.dev/v1/sql"
+    import requests
 
-    payload = {
-        "sqlText": query
-    }
+    url = "https://proxy.api.spaceandtime.dev/v1/sql"
 
     headers = {
         "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": f"Bearer {ACCESS_TOKEN}"
+        "apikey": API_KEY,
+        "content-type": "application/json"
     }
 
-    response = requests.post(url, json=payload, headers=headers)
+    data = {
+        "sqlText": query,
+    }
 
-    print(response.text)
+    response = requests.post(url, headers=headers, json=data)
+
+    return response.text
 
 
 if __name__ == '__main__':
-    send_sql("""SELECT * FROM SXT_DAPP_VIEWS.GROWING_ADOPTION
-LIMIT 20""")
+    print(send_sql("""SELECT * FROM SXT_DAPP_VIEWS.GROWING_ADOPTION
+LIMIT 20"""))
