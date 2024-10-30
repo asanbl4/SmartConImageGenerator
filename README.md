@@ -76,6 +76,7 @@ This project utilizes:
 4. **Telegram Bot**:
    - Interact with the project data and images through the Aiogram bot. Supported commands include:
      - `send photo/file` — it will automatically upload to the firebase which will be up-to-date in the test dashboard's markdown
+     - You can try it out at Telegram: @smartcon_test_bot
 
 
 ## Features
