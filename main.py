@@ -4,10 +4,12 @@ from downloader import download_doc_as_pdf
 
 
 if __name__ == '__main__':
-    for i in range(1, 3):
+    for i in range(1, 13):
         if_dark = False
-        if i == 2:
+        if not i % 2:
             if_dark = True
+        header_text = ""
+        body_text = ""
         doc_id = update_document_content(i, if_dark)
         download_doc_as_pdf(doc_id=doc_id, output_path=f"IMG{i}.pdf")
         convert_pdf_to_jpg(f"IMG{i}.pdf", f"IMG{i}.png")
