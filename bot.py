@@ -24,7 +24,7 @@ async def save_and_upload_image(message: types.Message):
     # Upload image to Firebase Storage
     upload_image_to_firebase("testimg.png")
 
-    await message.reply(f"Image saved and uploaded successfully! Firebase URL: https://firebasestorage.googleapis.com/v0/b/smartconhackathon-6d75b.appspot.com/o/testimg.png?alt=media&token=d1e9e6a6-948d-40f7-b6ff-8a57186c0a9b")
+    await message.reply(f"Image saved and uploaded successfully! Firebase URL: https://firebasestorage.googleapis.com/v0/b/smartconhackathon-6d75b.appspot.com/o/testimg.png?alt=media&token=d1e9e6a6-948d-40f7-b6ff-8a57186c0a9b\n\nImage will be changed within +-5 min")
 
 
 @router.message(lambda message: message.document and message.document.mime_type.startswith("image/"))

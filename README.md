@@ -15,7 +15,7 @@ This project provides a dynamic dashboard and interactive tool for analyzing and
 
 ## About the Project
 My Dashboard aims to stand out in the hackathon by using unique a storytelling theme: Biological evolution.
-
+- Dashboard: https://app.spaceandtime.ai/dashboards/public/zhanbolat
 ## The main feature
 Dynamically creating markdowns based on the graph/data.
 For example, my markdown is outdated a month later if the graph shows the data in the last 30 days. To fix that and keep markdowns automatically up-to-date.
@@ -77,8 +77,7 @@ This project utilizes:
    - Interact with the project data and images through the Aiogram bot. Supported commands include:
      - `send photo/file` — it will automatically upload to the firebase which will be up-to-date in the test dashboard's markdown
      - You can try it out at Telegram: @smartcon_test_bot
-
-
+     - Test dashboard https://app.spaceandtime.ai/dashboards/public/zhna
 ## Features
 - **Data Exploration**: Advanced querying and analysis of the Ethereum dataset, allowing for insights and trend identification.
 - **Real-Time Image Storage**: Firebase handles images, supporting auto-updates and consistent naming conventions.
