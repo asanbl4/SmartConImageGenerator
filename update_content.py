@@ -54,7 +54,7 @@ def upload_image_to_drive(image_path, if_dark=True):
     return file_id
 
 
-def update_document_content(i=1, if_dark=True):
+def update_document_content(header_text, body_text, i=1, if_dark=True):
     DOCUMENT_ID = os.getenv(f'IMG{i}_ID')
     doc = service.documents().get(documentId=DOCUMENT_ID).execute()
     content_length = doc.get('body').get('content')[-1].get('endIndex') - 1
@@ -75,11 +75,11 @@ def update_document_content(i=1, if_dark=True):
         documentId=DOCUMENT_ID, body={'requests': clear_request}).execute()
 
     # Define header and body texts
-    header_text = "First Movement: Daily Transactions Crescendo"
-    body_text = (
-        "Watch as the daily transactions soar, painting a vivid picture of zkSync's growingd. adoption. "
-        "This rising melody represents more users discovering the power and efficiency of layer-2 scaling."
-    )
+    # header_text = "First Movement: Daily Transactions Crescendo"
+    # body_text = (
+    #     "Watch as the daily transactions soar, painting a vivid picture of zkSync's growingd. adoption. "
+    #     "This rising melody represents more users discovering the power and efficiency of layer-2 scaling."
+    # )
     additional_line_breaks = "\n" * 2
 
     # Format header text
@@ -191,4 +191,4 @@ def update_document_content(i=1, if_dark=True):
 
 if __name__ == '__main__':
     update_document_content()
-    firebase_url = upload_image_to_firebase("IMG1.png")  # Upload the image to Firebase
+    # firebase_url = upload_image_to_firebase("IMG1.png")  # Upload the image to Firebase

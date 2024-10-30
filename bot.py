@@ -2,14 +2,10 @@ import os
 from aiogram import Bot, Router, types
 from aiogram import Dispatcher
 from dotenv import load_dotenv
-from firebase_admin import storage, initialize_app, credentials
+from update_content import upload_image_to_firebase
 
 # Load environment variables
 load_dotenv()
-
-# Initialize Firebase
-cred = credentials.Certificate(os.getenv("FIREBASE_API_KEYNAME"))
-initialize_app(cred, {'storageBucket': os.getenv("FIREBASE_STORAGE_BUCKET_NAME")})
 
 # Initialize Bot and Dispatcher
 API_TOKEN = os.getenv("TELEGRAM_API")
@@ -26,13 +22,21 @@ async def save_and_upload_image(message: types.Message):
     await bot.download_file(file.file_path, destination="testimg.png")
 
     # Upload image to Firebase Storage
-    bucket = storage.bucket()
-    blob = bucket.blob("testimg.png")
-    blob.upload_from_filename("testimg.png")
-    blob.make_public()
+    upload_image_to_firebase("testimg.png")
 
-    await message.reply(f"Image saved and uploaded successfully! Firebase URL: {blob.public_url}")
+    await message.reply(f"Image saved and uploaded successfully! Firebase URL: https://firebasestorage.googleapis.com/v0/b/smartconhackathon-6d75b.appspot.com/o/testimg.png?alt=media&token=d1e9e6a6-948d-40f7-b6ff-8a57186c0a9b")
 
+
+@router.message(lambda message: message.document and message.document.mime_type.startswith("image/"))
+async def save_and_upload_image_file(message: types.Message):
+    # Save the received image as 'testimg.png'
+    file = await bot.get_file(message.document.file_id)
+    await bot.download_file(file.file_path, destination="testimg.png")
+
+    # Upload image to Firebase Storage
+    upload_image_to_firebase("testimg.png")
+
+    await message.reply("Image saved and uploaded successfully! URL: https://firebasestorage.googleapis.com/v0/b/smartconhackathon-6d75b.appspot.com/o/testimg.png?alt=media&token=d1e9e6a6-948d-40f7-b6ff-8a57186c0a9b")
 
 # Set up dispatcher and polling
 dp = Dispatcher()
