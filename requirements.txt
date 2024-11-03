@@ -2,3 +2,10 @@ aiogram~=3.13.1
 python-dotenv~=1.0.1
 requests~=2.32.3
 pdf2image~=1.17.0
+poe-api-wrapper
+gspread
+oauth2client
+google-api-python-client
+google-auth
+google-auth-oauthlib
+firebase-admin
